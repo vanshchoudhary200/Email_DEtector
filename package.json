@@ -1,0 +1,14 @@
+{
+  "name": "suspicious-email-detector-mern",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Complete MERN stack suspicious email detector with JWT auth, risk scoring, history, and admin panel.",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "start": "npm start --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,21 @@
+export const disposableDomains = new Set([
+  "10minutemail.com",
+  "20minutemail.com",
+  "33mail.com",
+  "anonaddy.com",
+  "dispostable.com",
+  "emailondeck.com",
+  "fakeinbox.com",
+  "getnada.com",
+  "guerrillamail.com",
+  "maildrop.cc",
+  "mailinator.com",
+  "mintemail.com",
+  "moakt.com",
+  "sharklasers.com",
+  "tempmail.com",
+  "temp-mail.org",
+  "throwawaymail.com",
+  "trashmail.com",
+  "yopmail.com"
+]);
