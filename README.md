@@ -164,3 +164,39 @@ Scores are capped at 100 and mapped to `Low`, `Medium`, `High`, or `Critical`.
 - The temporary domain list is stored in `backend/src/services/disposableDomains.js` and can be expanded.
 - Admin access is controlled by the `role` field on users.
 - The included GitHub Pages workflow deploys only the React frontend. The Express/MongoDB backend still needs a backend host such as Render, Railway, Fly.io, or an always-on server. Set the repository variable `VITE_API_URL` to your deployed backend API URL before using the Pages deployment publicly.
+
+## Production Deployment
+
+### Backend on Render
+
+This repo includes `render.yaml` for a Render web service.
+
+1. Create a MongoDB Atlas cluster and copy the connection string.
+2. In Render, create a new Blueprint from this GitHub repository.
+3. Set these Render environment variables:
+
+   ```text
+   MONGO_URI=<your MongoDB Atlas URI>
+   CLIENT_URL=https://vanshchoudhary200.github.io/Email_DEtector
+   ADMIN_EMAIL=admin@example.com
+   ADMIN_PASSWORD=Admin@12345
+   ```
+
+4. After Render deploys, run the backend seed command once from Render Shell:
+
+   ```bash
+   npm run seed:admin
+   ```
+
+### Frontend on GitHub Pages
+
+1. Open the repository settings on GitHub.
+2. Go to **Pages**.
+3. Set **Build and deployment** source to **GitHub Actions**.
+4. Add a repository variable named `VITE_API_URL`:
+
+   ```text
+   https://your-render-service.onrender.com/api
+   ```
+
+5. Run the workflow named **Deploy Frontend to GitHub Pages**.
