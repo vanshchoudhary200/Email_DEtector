@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Detector - Suspicious Email Verification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --secondary: #ff6b35;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-darker: #020817;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #475569;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, #1a1a2e 50%, var(--bg-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animated background elements */
+        .bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .glow-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.1;
+        }
+
+        .glow-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .glow-2 {
+            width: 250px;
+            height: 250px;
+            background: var(--secondary);
+            bottom: 10%;
+            left: 5%;
+            animation: float 18s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0px, 0px); }
+            50% { transform: translate(30px, 30px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            animation: slideUp 0.8s ease-out 0.1s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 102, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 60px;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(51, 65, 85, 0.3));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(71, 85, 105, 0.4));
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Demo Section */
+        .demo {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(51, 65, 85, 0.5));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .btn-check {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            display: none;
+            border-left: 4px solid var(--primary);
+        }
+
+        .result.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(255, 107, 53, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(255, 107, 53, 0.2));
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Endpoints Section */
+        .endpoints {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .endpoints-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(51, 65, 85, 0.3));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        .endpoint {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .endpoint:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-right: 10px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .method-post {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .method-get {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--primary);
+        }
+
+        .method-patch {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .method-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .endpoint-path {
+            font-family: 'Fira Code', monospace;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .endpoint-desc {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        /* Getting Started */
+        .getting-started {
+            padding: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .steps {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(51, 65, 85, 0.3));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(71, 85, 105, 0.4));
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .step h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .code-block {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .demo-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-elements">
+        <div class="glow-circle glow-1"></div>
+        <div class="glow-circle glow-2"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    🔍 Email Detector
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                    <li><a href="#tech">Tech Stack</a></li>
+                    <li><a href="#api">API</a></li>
+                    <li><a href="#setup">Setup</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Suspicious Email Detector</h1>
+            <p class="hero-subtitle">Identify risky email addresses in seconds with advanced analysis</p>
+            <div class="cta-buttons">
+                <a href="#demo" class="btn btn-primary">Try Demo</a>
+                <a href="#setup" class="btn btn-secondary">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">✓</div>
+                    <h3>Email Validation</h3>
+                    <p>Comprehensive syntax validation to catch malformed email addresses instantly</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚫</div>
+                    <h3>Disposable Email Detection</h3>
+                    <p>Identify temporary and disposable email domains from an extensive database</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>DNS Verification</h3>
+                    <p>Real-time DNS lookups with MX record verification for domain validity</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Risk Scoring</h3>
+                    <p>Intelligent risk algorithms generate detailed scores and severity levels</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>JWT Authentication</h3>
+                    <p>Secure user sessions with industry-standard JWT token management</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Admin Panel</h3>
+                    <p>Role-based admin dashboard for system monitoring and user management</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <h2 class="section-title">Try It Out</h2>
+            <div class="demo-container">
+                <div class="demo-title">Email Risk Checker</div>
+                <div class="input-group">
+                    <label for="emailInput">Enter an email address:</label>
+                    <input type="email" id="emailInput" placeholder="example@domain.com">
+                </div>
+                <button class="btn-check" onclick="checkEmail()">Analyze Email</button>
+                <div class="result" id="result">
+                    <div class="result-item">
+                        <span class="result-label">Status:</span>
+                        <span class="result-value" id="resultStatus">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Risk Score:</span>
+                        <span class="result-value" id="resultScore">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Risk Level:</span>
+                        <span class="result-value" id="resultLevel">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Domain:</span>
+                        <span class="result-value" id="resultDomain">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech" class="tech-stack">
+        <div class="container">
+            <h2 class="section-title">Built With Modern Tech</h2>
+            <div class="tech-grid">
+                <div class="tech-badge">React</div>
+                <div class="tech-badge">Node.js</div>
+                <div class="tech-badge">Express</div>
+                <div class="tech-badge">MongoDB</div>
+                <div class="tech-badge">JWT Auth</div>
+                <div class="tech-badge">DNS API</div>
+                <div class="tech-badge">Vite</div>
+                <div class="tech-badge">Docker</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section id="api" class="endpoints">
+        <div class="container">
+            <h2 class="section-title">API Endpoints</h2>
+            <div class="endpoints-container">
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/api/auth/register</span>
+                    <p class="endpoint-desc">Register a new user account</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/api/auth/login</span>
+                    <p class="endpoint-desc">Authenticate user and receive JWT token</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/api/auth/me</span>
+                    <p class="endpoint-desc">Get current authenticated user information</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <span class="endpoint-path">/api/emails/check</span>
+                    <p class="endpoint-desc">Check email address for suspicious indicators</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/api/emails/history</span>
+                    <p class="endpoint-desc">Retrieve user's email check history</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-delete">DELETE</span>
+                    <span class="endpoint-path">/api/emails/history/:id</span>
+                    <p class="endpoint-desc">Delete a specific email check record</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/api/admin/stats</span>
+                    <p class="endpoint-desc">Get system statistics (admin only)</p>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-path">/api/admin/users</span>
+                    <p class="endpoint-desc">List all system users (admin only)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section id="setup" class="getting-started">
+        <div class="container">
+            <h2 class="section-title">Getting Started</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Install Dependencies</h3>
+                    <p>Clone the repository and install all required dependencies for frontend and backend.</p>
+                    <div class="code-block">npm install && npm run install:all</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Configure Environment</h3>
+                    <p>Set up your MongoDB connection string and JWT secret in the backend .env file.</p>
+                    <div class="code-block">PORT=5000<br>MONGO_URI=mongodb://localhost:27017/suspicious_email_detector<br>JWT_SECRET=your_secret_here</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Start MongoDB</h3>
+                    <p>Ensure MongoDB is running either locally or use the included Docker Compose setup.</p>
+                    <div class="code-block">docker compose up -d mongo</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Seed Admin User</h3>
+                    <p>Create the first admin user to access the admin panel.</p>
+                    <div class="code-block">cd backend && npm run seed:admin</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>Run the Application</h3>
+                    <p>Start both frontend and backend servers with the development command.</p>
+                    <div class="code-block">npm run dev</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <h3>Access the App</h3>
+                    <p>Open your browser and navigate to the frontend. Backend API runs separately.</p>
+                    <div class="code-block">Frontend: http://localhost:5173<br>Backend: http://localhost:5000/api/health</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 Email Detector. Secure email verification system.</p>
+                <div class="footer-links">
+                    <a href="#features">Features</a>
+                    <a href="#api">Documentation</a>
+                    <a href="#setup">Guide</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function checkEmail() {
+            const emailInput = document.getElementById('emailInput').value.trim();
+            const result = document.getElementById('result');
+            
+            if (!emailInput) {
+                alert('Please enter an email address');
+                return;
+            }
+
+            // Simple email validation pattern
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isValid = emailPattern.test(emailInput);
+            
+            // Extract domain
+            const domain = emailInput.split('@')[1] || 'unknown';
+            
+            // Simple risk calculation demo
+            let riskScore = 0;
+            let riskLevel = 'Low';
+
+            // Check for suspicious patterns
+            if (!isValid) {
+                riskScore += 50;
+            }
+
+            // Known disposable domains
+            const disposableDomains = ['tempmail.com', 'throwaway.email', '10minutemail.com', 'maildrop.cc'];
+            if (disposableDomains.some(d => domain.includes(d))) {
+                riskScore += 40;
+            }
+
+            // Check for too many numbers in local part
+            const localPart = emailInput.split('@')[0];
+            const numberRatio = (localPart.match(/\d/g) || []).length / localPart.length;
+            if (numberRatio > 0.5) {
+                riskScore += 15;
+            }
+
+            // Determine risk level
+            if (riskScore >= 75) riskLevel = 'Critical';
+            else if (riskScore >= 50) riskLevel = 'High';
+            else if (riskScore >= 25) riskLevel = 'Medium';
+            else riskLevel = 'Low';
+
+            // Display results
+            document.getElementById('resultStatus').textContent = isValid ? '✓ Valid' : '✗ Invalid';
+            document.getElementById('resultScore').textContent = riskScore + '/100';
+            document.getElementById('resultLevel').textContent = riskLevel;
+            document.getElementById('resultDomain').textContent = domain;
+
+            // Update border color based on risk
+            if (riskScore >= 75) {
+                result.style.borderLeftColor = '#ef4444';
+            } else if (riskScore >= 50) {
+                result.style.borderLeftColor = '#f59e0b';
+            } else if (riskScore >= 25) {
+                result.style.borderLeftColor = '#3b82f6';
+            } else {
+                result.style.borderLeftColor = '#10b981';
+            }
+
+            result.classList.add('show');
+        }
+
+        // Allow checking email with Enter key
+        document.getElementById('emailInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkEmail();
+            }
+        });
+    </script>
+</body>
+</html>
